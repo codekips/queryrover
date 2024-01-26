@@ -46,7 +46,8 @@
 3. Get latest previous close for all stocks whose face_value is 10
 >* Query Data (prev_close, face_val>10)
 >* prev_close: column name in a dataset.
->* **Question**: latest previous close would mean a nested call over this computed query. Is that expected?
+>* **Question**: latest previous close would mean a groupBy on the symbol, and then selecting where face value > 0. How will this be represented in the Query as show? How does the library decide what to group by on?
+Or, is the expectation here to make nested calls from client? 
 4. Get timeseries of open for a given symbol for last 1 year
 >* Query Data (open, date>01012023, date<01012024)
 >* open: column name in a dataset.
