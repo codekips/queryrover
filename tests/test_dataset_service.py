@@ -1,7 +1,7 @@
 import pytest
-from qrover.datasets.dataset import Dataset
-from qrover.datasets.service import DatasetService
-from qrover.storage.dataset_persistence import DataRepository
+from qRover.datasets.dataset import Dataset
+from qRover.datasets.service import DatasetService
+from qRover.storage.dataset_persistence import DataRepository
 
 class MockDataRepository(DataRepository):
     def post(self, dataset:Dataset):
@@ -18,7 +18,7 @@ def test_add_csv_dataset(service: DatasetService):
     mock_repo = MockDataRepository()
     service.repository = mock_repo
     name = "test_dataset"
-    location = "./dumps/small_file.csv"
+    location = "/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_file.csv"
     headers = ["header1", "header2"]
 
     dataset = service.add_csv_dataset(name, location, headers)
