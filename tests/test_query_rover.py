@@ -25,4 +25,14 @@ def test_user_computes_query(rover: QueryRover, rover_mgmt: RoverMgmt):
     rover_mgmt.add_dataset(name="small_equity", location="/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_equity.csv") # type: ignore
     q: Query = rover.fetch(['family','product']);
     df = q.compute()
-    assert len(df) == 100
+    assert len(df) == 10
+
+def test_user_computes_query_with_unrelated_tables(rover: QueryRover, rover_mgmt: RoverMgmt):
+    rover_mgmt.add_dataset(name="small_file", location="/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_file.csv") # type: ignore
+    rover_mgmt.add_dataset(name="small_student", location="/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_student.csv") # type: ignore
+    q: Query = rover.fetch(['family','age']);
+    df = q.compute()
+    # small file has 10 rows
+    #  small student has 20 rows
+
+    assert len(df) == 10*20
