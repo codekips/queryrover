@@ -1,7 +1,7 @@
 import pytest
-from qrover.datasets.dataset import Dataset
-from qrover.datasets.service import DatasetService
-from qrover.storage.dataset_persistence import DataRepository
+from qRover.datasets.dataset import Dataset
+from qRover.datasets.service import DatasetService
+from qRover.storage.dataset_persistence import DataRepository
 
 class MockDataRepository(DataRepository):
     def post(self, dataset:Dataset):
@@ -18,7 +18,7 @@ def test_add_csv_dataset(service: DatasetService):
     mock_repo = MockDataRepository()
     service.repository = mock_repo
     name = "test_dataset"
-    location = "./dumps/small_file.csv"
+    location = "/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_file.csv"
     headers = ["header1", "header2"]
 
     dataset = service.add_csv_dataset(name, location, headers)
@@ -26,3 +26,15 @@ def test_add_csv_dataset(service: DatasetService):
     assert isinstance(dataset, Dataset)
     assert dataset.name == name
     assert dataset.location == location
+
+
+#     qp = QueryProcessor()
+
+#     qp.fetch("a").where("a>b").and_("a>10").and_("b>10").compute();
+#     qp.fetch("sdf").compute();
+#     qp.fetch("max(volume) * min(price)").where("price>10").compute();
+
+# # Get latest previous close for all stocks whose face_value is 10
+
+#     qp.fetch("max(prev_close)").agg("symbol").where("face_value>10")
+#     select prev_close from equity,listing on equity.symbol=listing.symbol group by equity.symbol where 

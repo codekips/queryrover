@@ -1,8 +1,7 @@
 from typing import TypedDict
-from datasets.dataset import Dataset
 from typing_extensions import Unpack
-
-from datasets.service import DatasetService
+from .datasets.dataset import Dataset
+from .datasets.service import DatasetService
 
 
 class RoverMgmt(object):

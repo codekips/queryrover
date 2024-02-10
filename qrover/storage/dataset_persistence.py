@@ -19,19 +19,21 @@ class DataRepository(ABC):
         if not db_schema:
             raise InvalidDatasetException("No schema for the dataset. Can not insert")
         else:
-            if self.get(dataset.name):
+            if self.exists(dataset.name):
                 logger.info(f"{dataset.name} already exists in persistence. Ignoring request")
             else:
                 self.add_to_DB(dataset)
-                self.metadata_persistence.add_schema(db_schema)
+                self.metadata_persistence.add_dataset_columns(dataset)
     @abstractmethod
     def add_to_DB(self, dataset: Dataset) -> None:
         raise NotImplementedError
     @abstractmethod
-    def get(self, dataset_name: str)->Dataset|None:
-        raise NotImplementedError
+    def get(self, dataset_name: str)->Dataset:
+        raise NotImplementedError()
     def remove(self, dataset_name: str) -> bool:
-        raise NotImplementedError
+        raise NotImplementedError()
+    def exists(self, dataset_name: str) -> bool:
+        raise NotImplementedError()
     
 class InmemDataRepository(DataRepository):
     # Create InmemDataRepository as a singleton.
@@ -44,5 +46,7 @@ class InmemDataRepository(DataRepository):
             logger.info(f"{dataset.name} already exists in persistence. Ignoring request")
         else:
             self.datasets[dataset.name] = dataset          
-    def get(self, dataset_name: str)->Dataset|None:
-        return self.datasets.get(dataset_name, None)
+    def get(self, dataset_name: str)->Dataset:
+        return self.datasets[dataset_name]
+    def exists(self, dataset_name: str) -> bool:
+        return dataset_name in self.datasets

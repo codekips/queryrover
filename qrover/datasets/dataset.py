@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import csv
 from typing import Sequence
 from ..log.logging import logger
-from ..constants import VALIDATION_CHUNK_SIZE
+from ..config.constants import VALIDATION_CHUNK_SIZE
 from ..exceptions.exceptions import InvalidDatasetException
 class DBSchema():
     def __init__(self, name: str, columns: Sequence[str]) -> None:
@@ -26,7 +26,9 @@ class Dataset(ABC):
         self.name = name
         self.schema = None
         pass
-    def get_schema(self) -> None|DBSchema:
+    def get_schema(self) -> DBSchema:
+        if not self.schema:
+            raise InvalidDatasetException("get schema invoked without a schema")
         return self.schema
     @abstractmethod
     def validate_access(self):
@@ -34,6 +36,10 @@ class Dataset(ABC):
     @abstractmethod
     def fetch(self):
         pass
+
+    @abstractmethod
+    def type(self) -> str:
+        raise NotImplementedError();
     pass
 
 class CSVDataset(Dataset):
@@ -51,9 +57,10 @@ class CSVDataset(Dataset):
         except:
             logger.error("Error reading database for headers")
             raise
-    def __init__(self, name: str, location: str, header: list[str]) -> None:
+    def __init__(self, name: str, location: str, header: list[str]|None = None) -> None:
         super().__init__(name, location)
         self.name = name
+        self._type = "csv"
         self.schema = DBSchema(name, header) if header else self.__infer_schema()
     
     def fetch(self):
@@ -61,6 +68,8 @@ class CSVDataset(Dataset):
     def validate_access(self):
         with open(self.location, 'r') as db:
             db.read(VALIDATION_CHUNK_SIZE)
+    def type(self) -> str:
+        return self._type
             
 
     

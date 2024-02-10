@@ -1,6 +1,6 @@
 import pytest
 
-from qrover.datasets.dataset import DBSchema
+from qRover.datasets.dataset import DBSchema
 
 @pytest.fixture
 def dbschema():
