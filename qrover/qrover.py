@@ -25,11 +25,3 @@ class QueryRover(object):
         if len(non_empty_attributes) == 0:
             raise BadQueryException("Must request for atleast 1 non-empty attribute to be returned. Pass attrributes=[dimensions to fetch]")
         return Query(non_empty_attributes, self.engine)
-
-# class QueryProcessor(object):
-#     def __init__(self, config) -> None:
-#         pass
-#     def query_data(*args) -> pd.DataFrame:
-        
-#         return pd.DataFrame()
-
