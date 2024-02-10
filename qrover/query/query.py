@@ -27,7 +27,6 @@ class Query(object):
         queryBuilder = QualifiedDataQueryBuilder()
         qq = queryBuilder.build_output_dimensions(self.fetch_attributes).build()
         return qq
-        pass
 
     def compute(self)->pd.DataFrame:
         '''
