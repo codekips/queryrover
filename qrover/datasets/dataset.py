@@ -42,6 +42,14 @@ class Dataset(ABC):
         raise NotImplementedError();
     pass
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Dataset):
+            return (self.name == other.name)
+        else:
+            return False
+    def __hash__(self):
+        return hash(self.__repr__())
+
 class CSVDataset(Dataset):
     def __infer_schema(self) -> DBSchema:
         try:

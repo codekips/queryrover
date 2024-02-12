@@ -1,6 +1,6 @@
 import pytest
 from qRover.datasets.dataset import Dataset
-from qRover.datasets.service import DatasetService
+from qRover.datasets.service import MetaDataService
 from qRover.storage.dataset_persistence import DataRepository
 
 class MockDataRepository(DataRepository):
@@ -12,9 +12,9 @@ class MockDataRepository(DataRepository):
         pass
 @pytest.fixture
 def service():
-    return DatasetService()
+    return MetaDataService()
 
-def test_add_csv_dataset(service: DatasetService):
+def test_add_csv_dataset(service: MetaDataService):
     mock_repo = MockDataRepository()
     service.repository = mock_repo
     name = "test_dataset"

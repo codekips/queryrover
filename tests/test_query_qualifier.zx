@@ -1,0 +1,46 @@
+import pytest
+from qRover.datasets.dataset import CSVDataset, Dataset
+from qRover.query.parser import Dimension
+from qRover.query.qualifier import QualifiedDataQuery, QualifiedDataQueryBuilder
+
+
+    
+def test_required_datasets_empty_by_default():
+    query = QualifiedDataQuery()
+    assert len(query.required_datasets) == 0
+
+
+
+def test_dimensions_setter_updates_required_datasets():
+    dataset1 = CSVDataset(name="dataset1", location="location1")
+    dataset2 = CSVDataset(name="dataset2", location="location2")
+    query = QualifiedDataQueryBuilder().build_output_dimensions("col1").build()
+
+    dimension1 = Dimension(is_ambiguous=False, datasets=[dataset1])
+    dimension2 = Dimension(is_ambiguous=False, datasets=[dataset2])
+    query.dimensions = [dimension1, dimension2]
+    assert len(query.required_datasets) == 2
+    assert dataset1 in query.required_datasets
+    assert dataset2 in query.required_datasets
+
+def test_join_datasets_sql_returns_correct_sql():
+    query = QualifiedDataQuery()
+    dataset1 = CSVDataset(name="dataset1", location="location1")
+    dataset2 = CSVDataset(name="dataset2", location="location2")
+
+
+    query._datasets = {dataset1, dataset2, dataset3}
+    query.metadataService.intersection_col = lambda ds1, ds2: "common_column"
+    sql = query._join_datasets_sql()
+    assert sql == "dataset1 inner join dataset2 on dataset1.common_column = dataset2.common_column outer join dataset3"
+
+def test_to_sql_returns_correct_sql():
+    query = QualifiedDataQuery()
+    dataset1 = CSVDataset(name="dataset1", location="location1")
+    dataset2 = Dataset(name="dataset2")
+    dimension1 = Dimension(is_ambiguous=False, datasets=[dataset1])
+    dimension2 = Dimension(is_ambiguous=False, datasets=[dataset2])
+    query.dimensions = [dimension1, dimension2]
+    query.metadataService.intersection_col = lambda ds1, ds2: "common_column"
+    sql = query.to_sql()
+    assert sql == "SELECT dataset1.qualified_str,dataset2.qualified_str FROM dataset1 inner join dataset2 on dataset1.common_column = dataset2.common_column"

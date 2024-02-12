@@ -1,14 +1,14 @@
 from typing import TypedDict
 from typing_extensions import Unpack
 from .datasets.dataset import Dataset
-from .datasets.service import DatasetService
+from .datasets.service import MetaDataService
 
 
 class RoverMgmt(object):
    
 
 	def __init__(self) -> None:
-		self.dataset_service:DatasetService = DatasetService()
+		self.dataset_service:MetaDataService = MetaDataService()
 
 	"""
 	This will come in handy, when there are datasets that may need additional parameters to be fetched
