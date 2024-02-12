@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 import csv
 from typing import Sequence
+
+from qRover.utils.utils import convert_to_absolute_if_needed
 from ..log.logging import logger
 from ..config.constants import VALIDATION_CHUNK_SIZE
 from ..exceptions.exceptions import InvalidDatasetException
@@ -22,7 +24,7 @@ class DBSchema():
 
 class Dataset(ABC):
     def __init__(self, name: str, location: str) -> None:
-        self.location = location
+        self.location = convert_to_absolute_if_needed(location)
         self.name = name
         self.schema = None
         pass
@@ -54,7 +56,6 @@ class CSVDataset(Dataset):
     def __infer_schema(self) -> DBSchema:
         try:
             columns = []
-            print("my location", self.location)
             with open(self.location, 'r', encoding='utf-8-sig') as db:
                 reader = csv.DictReader(db)
                 columns = reader.fieldnames

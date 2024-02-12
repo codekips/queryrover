@@ -10,5 +10,5 @@ def sparkEngine():
 
 @pytest.fixture
 def datasets():
-    return [CSVDataset(name="small_file", location="/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_file.csv"),
-            CSVDataset(name="small_equity", location="/Users/aarora7/personal/code/BE/python/queryrover/tests/dumps/small_equity.csv")]
+    return [CSVDataset(name="small_file", location="tests/dumps/small_file.csv"),
+            CSVDataset(name="small_equity", location="tests/dumps/small_equity.csv")]
