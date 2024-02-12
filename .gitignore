@@ -2,3 +2,4 @@ rover_venvpy311/*
 dist/
 qRover.egg-info/
 *.pyc
+build/
