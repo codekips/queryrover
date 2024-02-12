@@ -1,7 +1,7 @@
 # Project Rover
 ## Usage:
 * Download this git repo, and install packages using setuptools
-
+* Run pytest to make sure all tests are going through
 ### Query Management:
 * Instantiate RoverMgmt with RoverMgt()
 * Add datasets, using the add_dataset function. Usage below
