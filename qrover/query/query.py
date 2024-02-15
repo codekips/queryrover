@@ -53,6 +53,7 @@ class Query(object):
         .build_output_dimensions(self._op_dims) \
         .build_conditional_clauses(self.chainedConditions) \
         .build()
+        qq.deambiguate()
         return qq
 
     def compute(self)->pd.DataFrame:
@@ -62,7 +63,6 @@ class Query(object):
         :rtype: pd.DataFrame
         '''
         qq = self._qualify()
-        qq.deambiguate()
         return self.engine.select(qq)
         
     def compute_async(self) -> str:
