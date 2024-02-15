@@ -13,7 +13,7 @@ class RoverMgmt(object):
 	"""
 	This will come in handy, when there are datasets that may need additional parameters to be fetched
 	"""
-	class DatasetParams(TypedDict) :
+	class _DatasetParams(TypedDict) :
 		userId: str
 		apiKey: str
 	"""
@@ -24,7 +24,7 @@ class RoverMgmt(object):
 		:param type: format of the passed dataset.
 		:param kwargs: any additional args that would be needed to add/ access this dataset.
 	"""
-	def add_dataset(self, name: str, location: str, type: str='csv', header:list[str]=[], **kwargs: Unpack[DatasetParams]) -> Dataset:
+	def add_dataset(self, name: str, location: str, type: str='csv', header:list[str]=[], **kwargs: Unpack[_DatasetParams]) -> Dataset:
 		match type:
 			case 'csv':
 				return self.dataset_service.add_csv_dataset(name, location, header)

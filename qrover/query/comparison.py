@@ -1,6 +1,13 @@
+import abc
 from enum import Enum
+from qRover.datasets.dataset import Dataset
 
 from qRover.query.parser import AttributeParser
+
+class Qualifiable(abc.ABC):
+    @abc.abstractmethod
+    def qualify(self, mapping: dict[str, Dataset]) -> None:
+        raise NotImplementedError()
 
 class ComparisonOperator(Enum):
     gt = '>'
@@ -24,7 +31,7 @@ class ChainOperator(Enum):
     and_ = 'and'
     or_ = 'or'
 
-class Condition(object):
+class Condition(Qualifiable):
     attibuteParser = AttributeParser()
     def __init__(self, operand1:str, operator: ComparisonOperator|str, operand2:str) -> None:
         '''
@@ -40,13 +47,28 @@ class Condition(object):
         self.operand2 = operand2
         self.operator = ComparisonOperator.from_str(operator) if isinstance(operator, str) else operator
         self._identified_columns = self.attibuteParser.extract_columns([operand1, operand2])
+        self._qual_operand1 = operand1
+        self._qual_operand2 = operand2
     def __str__(self) -> str:
-        return f"({self.operand1} {self.operator.value} {self.operand2})"
+        return f"({self._qual_operand1} {self.operator.value} {self._qual_operand2})"
     @property
     def identified_columns(self) -> list[str]:
         return self._identified_columns
     def to_str(self) -> str:
         return self.__str__()
+    def qualify(self, mapping: dict[str, Dataset]) -> None:
+        qual_op1 = self.operand1
+        qual_op2 = self.operand2
+        
+        for col in self._identified_columns:
+            qualified_col = f"{mapping[col].name}.{col}" 
+            qual_op1 = qual_op1.replace(col, qualified_col)
+            qual_op2 = qual_op2.replace(col, qualified_col)
+        self._qual_operand1 = qual_op1
+        self._qual_operand2 = qual_op2
+        pass
+
+
 
 class ConditionNode(object):
     def __init__(self, condition: Condition):

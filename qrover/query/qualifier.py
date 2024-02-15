@@ -64,28 +64,24 @@ class QualifiedDataQuery:
     def dims(self) -> Sequence[Dimension]:
         return self._dims
     
-    def _get_attribute_mapping (self, attrib: str) -> tuple[str, list[Dataset]]:
-        datasets = list(self.metadataService.get_datasets_containing(attrib))
-        return(attrib, datasets)
     def _is_mapping_unambiguous(self, col_dataset_map: tuple[str,list[Dataset]]) -> bool:
         (_, datasets) = col_dataset_map
         return len(datasets) == 1
-    def deambiguate(self) -> None:
-        # Takes in all required columns in the different parts of the query, and makes sure they only map to a single dataset. This is an expensive operation, and must only be done once, when the query is ready to be used.
+    def _prepare_attribute_mappings(self) -> tuple[set[Dataset], dict[str, Dataset]]:
         confirmed_datasets: set[Dataset] = set()
         column_mapping: dict[str, Dataset] = dict()
 
         all_identified_attributes = self._dims_attributes.union(self._condition_attributes)
-        all_column_mappings = list(map(self._get_attribute_mapping ,all_identified_attributes))
-        
+        all_column_mappings = [(attrib, list(self.metadataService.get_datasets_containing(attrib))) for attrib in all_identified_attributes]        
         unambiguous_mappings = filter(self._is_mapping_unambiguous,all_column_mappings)
-        [confirmed_datasets.add(datasets[0]) for (_,datasets) in unambiguous_mappings]
-        if len(confirmed_datasets) == 0:
-               raise BadQueryException("Query is ambiguous. No way of selecting columns from datasets")
+        
         for (col, datasets) in unambiguous_mappings:
+            confirmed_datasets.add(datasets[0])
             column_mapping[col] = list(datasets)[0]
-
-        ambiguous_mappings = filter(lambda colmap: not self._is_mapping_unambiguous(colmap),all_column_mappings)
+        
+        ambiguous_mappings = list(filter(lambda colmap: not self._is_mapping_unambiguous(colmap),all_column_mappings))
+        if (not confirmed_datasets) & len(ambiguous_mappings)>0:
+               raise BadQueryException("Query is ambiguous. No way of selecting columns from datasets")
         for (col, datasets) in ambiguous_mappings:
             logger.info(f"Attempting to deambiguate datasets {datasets} for column: {col}")
             matching_dataset = next(filter(lambda dataset: dataset in confirmed_datasets, datasets))
@@ -93,7 +89,17 @@ class QualifiedDataQuery:
         self.set_mapping(column_mapping)
         self.set_required_datasets(confirmed_datasets)
         self.is_ambiguous=False
-
+        return (confirmed_datasets, column_mapping)
+    def _update_qualifications(self, attrib_dataset_mappings: dict[str, Dataset])->None:
+        [dim.qualify(attrib_dataset_mappings) for dim in self._dims]
+        if self._condition_chain:
+            [condition.qualify(attrib_dataset_mappings) for condition in self._condition_chain ]
+        pass
+    def deambiguate(self) -> None:
+        # Takes in all required columns in the different parts of the query, and makes sure they only map to a single dataset. This is an expensive operation, and must only be done once, when the query is ready to be used.
+        (_, attrib_dataset_mappings) = self._prepare_attribute_mappings()
+        self._update_qualifications(attrib_dataset_mappings)
+        pass
     def isColumnMappingDeterminate(self) -> bool:
         return not self.is_ambiguous
     def _inner_join(self, dataset1: Dataset, dataset2: Dataset, common_column:str):
@@ -118,7 +124,7 @@ class QualifiedDataQuery:
         return joined
     def to_sql(self) -> str:
         # update this thing.. all should qualify their strings.
-        comma_sep_cols  = ','.join([dim.raw_str for dim in self._dims])
+        comma_sep_cols  = ','.join([dim.qual_str for dim in self._dims])
         joined_datasets = self._join_datasets_sql()
         clause = "" if not self.condition_chain else self.condition_chain.as_str()
         # do inner join, on the common column between the two.

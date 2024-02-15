@@ -44,3 +44,12 @@ def test_user_computes_query_with_clause(rover: QueryRover, rover_mgmt: RoverMgm
     df = q.compute()
     assert len(df) == 5
 
+def test_user_computes_query_with_common_attr(rover: QueryRover, rover_mgmt: RoverMgmt):
+    rover_mgmt.add_dataset(name="small_file", location="tests/dumps/small_file.csv") # type: ignore
+    rover_mgmt.add_dataset(name="small_equity", location="tests/dumps/small_equity.csv") # type: ignore
+    q: Query = rover.fetch(['can','desc']).where('family','==',"'ProSeries'");
+    df = q.compute()
+    assert len(df) == 5
+
+
+
